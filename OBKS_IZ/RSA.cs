@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -16,15 +17,15 @@ namespace OBKS_IZ
         //Чтобы не тратить время на генерацию простых чисел, создадим массив с первыми простыми числами
         int[] prim_arr = new int[]
         {
-        3,  5,  7,  11, 13, 17, 19, 23, 29, 31, 37//, 41, 43, 47, 53, 59, 61, 67, 71,
-//73, 79, 83, 89, 97, 101,    103,    107,    109,    113,    127,    131,    137,    139,    149,    151,    157,    163,    167,    173,
-//179,    181,    191,    193,    197,    199,    211,    223,    227,    229,    233,    239,    241,    251,    257,    263,    269,    271,    277,    281,
-//283,    293,    307,    311,    313,    317,    331,    337,    347,    349,    353,    359,    367,    373,    379,    383,    389,    397,    401,    409,
+        3,  5,  7,  11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71,
+73, 79, 83, 89, 97, 101,    103,    107,    109,    113,    127,    131,    137,    139,    149,    151,    157,    163,    167,    173,
+179,    181,    191,    193,    197,    199,    211,    223,    227,    229,    233,    239,    241,    251,    257,    263,    269,    271,    277,    281,
+283,    293,    307,    311,    313,    317,    331,    337,    347,    349//,    353,    359,    367,    373,    379,    383,    389,    397,    401,    409,
 //419,    421,    431,    433,    439,    443,    449,    457,    461,    463,    467,    479,    487,    491,    499,    503,    509,    521,    523,    541,
 //547,    557,    563,    569,    571,    577,    587,    593,    599,    601,    607,    613,    617,    619,    631,    641,    643,    647,    653,    659,
 //661,    673,    677,    683,    691,    701,    709,    719,    727,    733,    739,    743,    751,    757,    761,    769,    773,    787,    797,    809,
 //811,    821,    823,    827,    829,    839,    853,    857,    859,    863,    877,    881,    883,    887,    907,    911,    919,    929,    937,    941,
-//947,    953,    967,    971,    977,    983,    991,    997,    1009,   1013,   1019,   1021,   1031,   1033,   1039,   1049,   1051,   1061,   1063,   1069,
+//947,    953,    967,    971,    977,    983,    991,    997//,    1009,   1013,   1019,   1021,   1031,   1033,   1039,   1049,   1051,   1061,   1063,   1069,
 //1087,   1091,   1093,   1097,   1103,   1109,   1117,   1123,   1129,   1151,   1153,   1163,   1171,   1181,   1187,   1193,   1201,   1213,   1217,   1223,
 //1229,   1231,   1237,   1249,   1259,   1277,   1279,   1283,   1289,   1291,   1297,   1301,   1303,   1307,   1319,   1321,   1327,   1361,   1367,   1373,
 //1381,   1399,   1409,   1423,   1427,   1429,   1433,   1439,   1447,   1451,   1453,   1459,   1471,   1481,   1483,   1487,   1489,   1493,   1499,   1511,
@@ -125,6 +126,9 @@ namespace OBKS_IZ
             while ((d2 * ee) % fi != 1);
             textBox_c_key2_d.Text = d2.ToString();
 
+            textBox_enc_input_TextChanged(sender, e);
+            textBox_dec_input_TextChanged(sender, e);
+            textBox_dec_input2_TextChanged(sender, e);
         }
 
         private void button_apply_Click(object sender, EventArgs e)
@@ -157,76 +161,138 @@ namespace OBKS_IZ
                 d2++;
             while ((d2 * ee) % fi != 1);
             textBox_c_key2_d.Text = d2.ToString();
+
+            textBox_enc_input_TextChanged(sender, e);
+            textBox_dec_input_TextChanged(sender, e);
+            textBox_dec_input2_TextChanged(sender, e);
         }
 
 
         private void textBox_enc_input_TextChanged(object sender, EventArgs e)
         {
+            // Проверки
+            if (textBox_enc_input.Text == "")
+                return;
 
-            if (System.Text.RegularExpressions.Regex.IsMatch(textBox_enc_input.Text, "[^0-9]"))
+            if (textBox_enc_input.Text[textBox_enc_input.Text.Length-1]>=(char)n)
             {
-                MessageBox.Show("Шифруем числа");
+                MessageBox.Show("Шифруем символы от "+(char)1+" до "+ (char)(n-1));
                 textBox_enc_input.Text = textBox_enc_input.Text.Remove(textBox_enc_input.Text.Length - 1);
+                textBox_enc_input.SelectionStart = textBox_enc_input.Text.Length;
             }
 
             textBox_enc_output.Text = "";
-            if (textBox_o_key_n.Text == "")
+            if (textBox_o_key_n.Text == "" || textBox_o_key_e.Text == "")
             { MessageBox.Show("Введите ключ!"); textBox_enc_input.Text = ""; return; }
 
-            double c = double.Parse(textBox_enc_input.Text);
-            double enc = Math.Pow(c, ee) % n;
-            textBox_enc_output.Text = enc.ToString();
-
-            //for (int i = 0; i < textBox_enc_input.Text.Length; i++)
+            //double c = double.Parse(textBox_enc_input.Text);
+            //if (c >= n)
+            //{ MessageBox.Show("Можно шифровать числа только в пределах [0; n-1]"); textBox_dec_input.Text = ""; return; }
+            ////double enc = Math.Pow(c, ee) % n;
+            //double enc = c;
+            //for (double i= 0; i < ee-1; i++)
             //{
-            //    int c = textBox_enc_input.Text[i];
-            //    double enc = Math.Pow(c, ee) % n;
-            //    char encrypted = (char)(enc);
-            //        textBox_enc_output.Text += encrypted;
+            //    enc = (enc * c) % n;
             //}
+            //textBox_enc_output.Text = enc.ToString();// ((char)(enc+'A'-1)).ToString();
+
+            // Шифрование
+            for (int i = 0; i < textBox_enc_input.Text.Length; i++)
+            {
+                int c = textBox_enc_input.Text[i];
+                //Console.WriteLine("Код шифруемого символа " + textBox_enc_input.Text[i] + " равен " + c.ToString());
+                double enc = c;
+                for (double j = 0; j < ee - 1; j++)
+                {
+                    enc = (enc * c) % n;
+                }
+                char encrypted = (char)(enc);
+                //Console.WriteLine("Код зашифрованного символа " + encrypted + " равен " + enc.ToString());
+                textBox_enc_output.Text += encrypted;
+            }
         }
 
         private void textBox_dec_input_TextChanged(object sender, EventArgs e)
         {
+            // Проверки
+            if (textBox_dec_input.Text == "")
+                return;
+
+            if (textBox_dec_input.Text[textBox_dec_input.Text.Length - 1] >= (char)n)
+            {
+                MessageBox.Show("Шифруем символы от " + (char)1 + " до " + (char)(n - 1));
+                textBox_dec_input.Text = textBox_dec_input.Text.Remove(textBox_dec_input.Text.Length - 1);
+                textBox_dec_input.SelectionStart = textBox_dec_input.Text.Length;
+            }
+
             textBox_dec_output.Text = "";
             if (textBox_c_key1_n.Text == "" || textBox_c_key1_d.Text == "")
             { MessageBox.Show("Введите ключ!"); textBox_dec_input.Text = ""; return; }
 
-            if (textBox_dec_input.Text == "")
-                return;
+            //double c = double.Parse(textBox_dec_input.Text);
 
-            double c = double.Parse(textBox_dec_input.Text);
-            double dec = Math.Pow(c, d1) % n;
-            textBox_dec_output.Text = dec.ToString();
-            //for (int i = 0; i < textBox_dec_input.Text.Length; i++)
+            //if (c >= n)
+            //{ MessageBox.Show("Можно шифровать числа только в пределах [0; n-1]"); textBox_dec_input.Text = ""; return; }
+
+            //double dec = Math.Pow(c, d1) % n;
+            //double dec = c;
+            //for(double i = 0; i < d1-1; i++)
             //{
-            //    int c = textBox_dec_input.Text[i];
-            //    double dec = Math.Pow(c, d1) % n;
-            //    char decrypted = (char)(dec);
-            //    textBox_dec_output.Text += decrypted;
+            //    dec = (dec * c) % n;
             //}
+            //textBox_dec_output.Text = dec.ToString(); // ((char)(dec + 'A' - 1)).ToString();
+
+            // Дешифрование
+            for (int i = 0; i < textBox_dec_input.Text.Length; i++)
+            {
+                int c = textBox_dec_input.Text[i];
+                //Console.WriteLine("Код дешифруемого символа " + textBox_dec_input.Text[i] + " равен " + c.ToString());
+                double dec = c;
+                for (double j = 0; j < d1 - 1; j++)
+                {
+                    dec = (dec * c) % n;
+                }
+                char decrypted = (char)(dec);
+                //Console.WriteLine("Код расшифрованного символа " + decrypted +  " равен " + dec.ToString());
+                textBox_dec_output.Text += decrypted;
+            }
         }
 
         private void textBox_dec_input2_TextChanged(object sender, EventArgs e)
         {
+            if (textBox_dec_input2.Text == "")
+                return;
+
+            if (textBox_dec_input2.Text[textBox_dec_input2.Text.Length - 1] >= (char)n)
+            {
+                MessageBox.Show("Шифруем символы от " + (char)1 + " до " + (char)(n - 1));
+                textBox_dec_input2.Text = textBox_dec_input2.Text.Remove(textBox_dec_input2.Text.Length - 1);
+                textBox_dec_input2.SelectionStart = textBox_dec_input2.Text.Length;
+            }
+
             textBox_dec_output2.Text = "";
             if (textBox_c_key2_n.Text == "" || textBox_c_key2_d.Text == "")
             { MessageBox.Show("Введите ключ!"); textBox_dec_input2.Text = ""; return; }
 
-            if (textBox_dec_input2.Text == "")
-                return;
+            //double c = double.Parse(textBox_dec_input2.Text);
 
-            double c = double.Parse(textBox_dec_input2.Text);
-            double dec = Math.Pow(c, d2) % n;
-            textBox_dec_output2.Text = dec.ToString();
+            //if (c >= n)
+            //{ MessageBox.Show("Можно шифровать числа только в пределах [0; n-1]"); textBox_dec_input.Text = ""; return; }
 
-            //for (int i = 0; i < textBox_dec_input2.Text.Length; i++)
-            //{
-            //    int c = textBox_dec_input2.Text[i];
-            //    double dec = Math.Pow(c, d2) % n;
-            //    char decrypted = (char)(dec);
-            //    textBox_dec_output2.Text += decrypted;
-            //}
+            //double dec = Math.Pow(c, d2) % n;
+            //textBox_dec_output2.Text = ((char)(dec + 'A' - 1)).ToString();
+
+            for (int i = 0; i < textBox_dec_input2.Text.Length; i++)
+            {
+                int c = textBox_dec_input2.Text[i];
+                double dec = c;
+                for (double j = 0; j < d2 - 1; j++)
+                {
+                    dec = (dec * c) % n;
+                }
+                char decrypted = (char)(dec);
+                textBox_dec_output2.Text += decrypted;
+            }
         }
     }
 }
