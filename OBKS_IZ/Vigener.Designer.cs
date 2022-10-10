@@ -245,6 +245,7 @@
             this.picture_table.Location = new System.Drawing.Point(337, 19);
             this.picture_table.Name = "picture_table";
             this.picture_table.Size = new System.Drawing.Size(663, 663);
+            this.picture_table.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
             this.picture_table.TabIndex = 28;
             this.picture_table.TabStop = false;
             // 

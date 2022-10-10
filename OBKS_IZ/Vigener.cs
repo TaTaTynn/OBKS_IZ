@@ -68,6 +68,7 @@ namespace OBKS_IZ
             if (key == "")
             { MessageBox.Show("Введите ключ!"); textBox_enc_input.Text = ""; return; }
 
+                int spaces_etc = 0;
             for (int i = 0; i < textBox_enc_input.Text.Length; i++)
             {
                 char c = textBox_enc_input.Text[i];
@@ -80,17 +81,18 @@ namespace OBKS_IZ
                 }
                 if (isCyrillSmall(c))
                 {
-                    char encrypted = vigRu[c][key[i % key.Length]];
+                    char encrypted = vigRu[c][key[(i - spaces_etc) % key.Length]];
                     textBox_enc_output.Text += encrypted;
                 }
                 else if (isLatinSmall(c))
                 {
-                    char encrypted = vigEn[c][key[i % key.Length]];
+                    char encrypted = vigEn[c][key[(i - spaces_etc) % key.Length]];
                     textBox_enc_output.Text += encrypted;
                 }
                 else
                 {
                     textBox_enc_output.Text += textBox_enc_input.Text[i];
+                    spaces_etc++;
                 }
             }
         }
@@ -122,6 +124,7 @@ namespace OBKS_IZ
             if (key == "")
             { MessageBox.Show("Введите ключ!"); textBox_dec_input.Text = ""; return; }
 
+                int spaces_etc = 0;
             for (int i = 0; i < textBox_dec_input.Text.Length; i++)
             {
                 char c = textBox_dec_input.Text[i];
@@ -137,7 +140,7 @@ namespace OBKS_IZ
                     char decrypted = ' ';
                     for (char n = a; n <= z; n++)
                     {
-                        if (vigRu[n][key[i % key.Length]] == c)
+                        if (vigRu[n][key[(i - spaces_etc) % key.Length]] == c)
                         {
                             decrypted = n;
                             break;
@@ -150,7 +153,7 @@ namespace OBKS_IZ
                     char decrypted = ' ';
                     for (char n = a; n <= z; n++)
                     {
-                        if (vigEn[n][key[i % key.Length]] == c)
+                        if (vigEn[n][key[(i - spaces_etc) % key.Length]] == c)
                         {
                             decrypted = n;
                             break;
@@ -161,6 +164,7 @@ namespace OBKS_IZ
                 else
                 {
                     textBox_dec_output.Text += textBox_dec_input.Text[i];
+                    spaces_etc++;
                 }
             }
         }

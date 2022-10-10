@@ -85,8 +85,8 @@ namespace OBKS_IZ
             {
                 if (isCyrillSmall(textBox_enc_input.Text[i]) || isCyrillBig(textBox_enc_input.Text[i]))
                 {
-                    int count = (int)('Я' - 'А');
-                    int move = shift % count;
+                    int count = (int)('Я' - 'А' + 1);
+                    int move = shift % (count - 1);
                     char encrypted = (char)(textBox_enc_input.Text[i] + move);
                     if (isCyrillBig(textBox_enc_input.Text[i]) && !isCyrillBig(encrypted))
                     {
@@ -100,8 +100,8 @@ namespace OBKS_IZ
                 }
                 else if (isLatinBig(textBox_enc_input.Text[i]) || isLatinSmall(textBox_enc_input.Text[i]))
                 {
-                    int count = (int)('Z' - 'A');
-                    int move = shift % count;
+                    int count = (int)('Z' - 'A' + 1);
+                    int move = shift % (count - 1);
                     char encrypted = (char)(textBox_enc_input.Text[i] + move);
                     if (isLatinBig(textBox_enc_input.Text[i]) && !isLatinBig(encrypted))
                     {
@@ -127,8 +127,8 @@ namespace OBKS_IZ
             {
                 if (isCyrillSmall(textBox_dec_input.Text[i]) || isCyrillBig(textBox_dec_input.Text[i]))
                 {
-                    int count = (int)('Я' - 'А');
-                    int move = shift % count;
+                    int count = (int)('Я' - 'А' + 1);
+                    int move = shift % (count-1);
                     char decrypted = (char)(textBox_dec_input.Text[i] - move);
                     if (isCyrillBig(textBox_dec_input.Text[i]) && !isCyrillBig(decrypted))
                     {
@@ -142,8 +142,8 @@ namespace OBKS_IZ
                 }
                 else if (isLatinBig(textBox_dec_input.Text[i]) || isLatinSmall(textBox_dec_input.Text[i]))
                 {
-                    int count = (int)('Z' - 'A');
-                    int move = shift % count;
+                    int count = (int)('Z' - 'A' + 1);
+                    int move = shift % (count-1);
                     char decrypted = (char)(textBox_dec_input.Text[i] - move);
                     if (isLatinBig(textBox_dec_input.Text[i]) && !isLatinBig(decrypted))
                     {
